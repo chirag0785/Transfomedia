@@ -9,6 +9,7 @@ const isPublicRoute = createRouteMatcher([
 
 const isPublicApiRoute = createRouteMatcher([
     '/api/videos',
+    '/api/video-upload-notification',
 ])
 export default clerkMiddleware((auth, req) => {
     const {userId}=auth();
