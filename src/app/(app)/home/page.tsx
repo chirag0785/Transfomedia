@@ -1,11 +1,13 @@
 "use client"
 import VideoCard from '@/components/VideoCard';
+import { useAuth } from '@clerk/nextjs';
 import { Video } from '@prisma/client';
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 
 const Home = () => {
   const [videos,setVideos]=useState<Video[]>([]);
+  const {userId}=useAuth();
   const fetchVideos = async () => {
     try{
       const response=await axios.get('/api/videos');
@@ -16,7 +18,7 @@ const Home = () => {
   }
   useEffect(()=>{
     fetchVideos();
-  },[])
+  },[userId])
 
   const onDownload=async (url:string,title:string)=>{
     fetch(url) //fetches buffer response

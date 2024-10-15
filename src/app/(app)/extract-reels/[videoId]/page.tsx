@@ -3,7 +3,7 @@ import { Video } from '@prisma/client';
 import axios from 'axios'
 import { getCldVideoUrl } from 'next-cloudinary';
 import React, { useCallback, useEffect, useState } from 'react'
-const page = ({params}:{params:{videoId:string}}) => {
+const Page = ({params}:{params:{videoId:string}}) => {
   const [video,setVideo]=useState<Video>();
   const [reelLength,setReelLength]=useState(10);
   const [previewError,setPreviewError]=useState(false);
@@ -44,4 +44,4 @@ const page = ({params}:{params:{videoId:string}}) => {
   )
 }
 
-export default page
+export default Page
