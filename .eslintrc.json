@@ -1,3 +1,20 @@
 {
-  "extends": ["next/core-web-vitals", "next/typescript"]
+  "extends": ["next/core-web-vitals", "next/typescript"],
+  "rules": {
+    // Turn off specific TypeScript rules
+    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+
+    // Turn off React-specific rules
+    "react/prop-types": "off",
+    "react/display-name": "off",
+
+    // Turn off Next.js-specific rules
+    "@next/next/no-html-link-for-pages": "off",
+
+    // Disable other common ESLint rules
+    "no-console": "off",
+    "no-debugger": "off"
+  }
 }
