@@ -53,7 +53,7 @@ const Page = ({ params }: { params: { videoId: string } }) => {
     return () => {
         channel.unsubscribe();
     }
-  },[])
+  },[userId])
 
   const extractReelsHandler=(ev:React.FormEvent<HTMLFormElement>)=>{
     ev.preventDefault();
