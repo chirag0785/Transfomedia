@@ -20,6 +20,7 @@ model Video{
   originalSize String
   compressedSize String
   srtFileProcessingDone Boolean
+  reelTransformed Boolean?
   userId String
   duration Float
   createdAt DateTime @default(now())

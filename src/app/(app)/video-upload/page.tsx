@@ -44,6 +44,7 @@ const Page = () => {
   }
   return (
     <div className="flex items-center justify-center min-h-screen">
+      
       <form
         onSubmit={uploadVideoHandler}
         className="bg-slate-400 shadow-lg rounded-lg p-6 max-w-md w-full space-y-6"
