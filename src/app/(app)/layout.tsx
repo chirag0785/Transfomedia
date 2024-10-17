@@ -19,7 +19,7 @@ export default function HomeLayout({
                 <Sidebar />
             </div>
 
-            <div className="flex-1 p-6">
+            <div className="flex-1 p-6 bg-slate-600">
                 {children}
             </div>
         </div>
