@@ -4,23 +4,31 @@ import axios from 'axios';
 import { Loader2 } from 'lucide-react';
 import { getCldVideoUrl } from 'next-cloudinary';
 import React, { useCallback, useEffect, useState } from 'react';
-import ably from '@/lib/ably';
 import { useAuth } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
 
 const Page = ({ params }: { params: { videoId: string } }) => {
   const [video, setVideo] = useState<Video | null>(null);
   const [reelLength, setReelLength] = useState(0);
   const [reelUrl, setReelUrl] = useState('');
-  const [isTransformationReady, setIsTransformationReady] = useState(false);
-  const { userId } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const {userId}=useAuth();
+  const router=useRouter();
+  useEffect(()=>{
+    if(!userId){
+      router.refresh();
+      router.push('/');
+    }
+  },[userId])
+  // Fetch video details
   const getVideo = useCallback(async () => {
     try {
       const response = await axios.get(`/api/video/${params.videoId}`);
-      const fetchedVideo = response.data.video;
-      setVideo(fetchedVideo);
+      setVideo(response.data.video);
     } catch (err) {
+      setError('Failed to fetch video details');
       console.error(err);
-      alert('Error while fetching video');
     }
   }, [params.videoId]);
 
@@ -28,106 +36,107 @@ const Page = ({ params }: { params: { videoId: string } }) => {
     getVideo();
   }, [getVideo]);
 
-  const getReels = useCallback(() => {
-    if (video) {
-      const url = getCldVideoUrl({
-        src: video.publicId,
-        crop: 'fill',
-        width: 300,
-        height: 200,
-        quality: 'auto',
-        gravity: 'auto',
-        assetType: 'video',
-        rawTransformations: [`e_preview:duration_${reelLength}:max_seg_9:min_seg_dur_1`],
-      });
-      setReelUrl(url);
+  // Check if transformation is ready
+  const checkTransformation = useCallback(async (url: string): Promise<boolean> => {
+    try {
+      const response = await fetch(url, { method: 'HEAD' });
+      return response.ok;
+    } catch {
+      return false;
     }
-  }, [reelLength, video]);
+  }, [userId]);
 
-  useEffect(() => {
-    const channel = ably.channels.get(`private:${userId}`);
-    const subscription = channel.subscribe('webhook-notification-preview', (message) => {
-      setIsTransformationReady(true);
-    });
-    const handleConnectionEvents = () => {
-      // Handle disconnections
-      ably.connection.on('disconnected', () => {
-        console.warn('Ably connection disconnected. Retrying...');
-      });
+  // Generate and check reels
+  const generateReels = useCallback(async () => {
+    if (!video) return;
 
-      // Handle reconnection attempts
-      ably.connection.on('connecting', () => {
-        console.log('Attempting to reconnect to Ably...');
-      });
-
-      // Handle successful reconnections
-      ably.connection.on('connected', () => {
-        console.log('Reconnected to Ably successfully!');
-      });
-
-      // Handle permanent failures
-      ably.connection.on('failed', (error) => {
-        console.error('Ably connection failed:', error);
-        alert('Connection failed. Please check your network or try again later.');
-      });
-    };
-
-    handleConnectionEvents(); // Attach event listeners
-
-    // Keep the connection alive by sending periodic pings
-    const pingInterval = setInterval(() => {
-      if (ably.connection.state === 'connected') {
-        console.log('Sending ping to keep connection alive');
-        ably.connection.ping()
-        .then(() => {
-          console.log("Ping successfully sent");
-        })
-        .catch((err)=>{
-          console.error(err);
-        })
-      }
-    }, 30000); // Ping every 30 seconds
-
-    return () => {
-      channel.unsubscribe(); // Clean up subscription
-      clearInterval(pingInterval); // Clean up interval
-    };
-  }, [userId])
-
-  const extractReelsHandler = (ev: React.FormEvent<HTMLFormElement>) => {
-    console.log("submit");
+    setIsLoading(true);
+    setError(null);
     
+    const transformedUrl = getCldVideoUrl({
+      src: video.publicId,
+      width: 400,
+      height: 225,
+      assetType: 'video',
+      rawTransformations: [`e_preview:duration_${reelLength}:max_seg_9:min_seg_dur_1`],
+      quality:100
+    });
+
+    let attempts = 0;
+    const maxAttempts = 36; // 3 minute total (36 * 5 seconds)
+    const pollTransformation = async () => {
+      const isReady = await checkTransformation(transformedUrl);
+      
+      if (isReady) {
+        setReelUrl(transformedUrl);
+        setIsLoading(false);
+      } else if (attempts < maxAttempts) {
+        attempts++;
+        setTimeout(pollTransformation, 5000);
+      } else {
+        setError('Transformation timed out. Please try again.');
+        setIsLoading(false);
+      }
+    };
+
+    pollTransformation();
+  }, [video, reelLength, checkTransformation]);
+
+  const handleExtractReels = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
-    getReels();
-  }
+    generateReels();
+  };
+
   return (
-    <div>
-      Heelo
-      <form onSubmit={extractReelsHandler} className="flex flex-col gap-2">
-        <label>
-          Set Reel Length
-          <input
-            type="range"
-            min={10}
-            max={60}
-            value={reelLength}
-            onChange={(e) => setReelLength(Number(e.target.value))}
-            className="range"
-          />
-        </label>
-        <button>Extract Reel</button>
+    <div className="p-4 max-w-xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4">Video Reel Extractor</h1>
+      
+      <form onSubmit={handleExtractReels} className="space-y-4 mb-6">
+        <div className="space-y-2">
+          <label className="block text-sm font-medium">
+            Reel Length: {reelLength} seconds
+            <input
+              type="range"
+              min={10}
+              max={60}
+              value={reelLength}
+              onChange={(e) => setReelLength(Number(e.target.value))}
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            />
+          </label>
+        </div>
+        
+        <button
+          type="submit"
+          disabled={isLoading || !video}
+          className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isLoading ? 'Processing...' : 'Extract Reel'}
+        </button>
       </form>
-      {video && isTransformationReady ? (
-        <video
-          src={reelUrl}
-          width={300}
-          height={200}
-          controls
-          onError={() => setIsTransformationReady(false)}
-        />
-      ) : (
-        video && <Loader2 className='animate-spin' />
+
+      {error && (
+        <div className="p-4 mb-4 text-red-700 bg-red-100 rounded-lg" onClick={()=> generateReels()}>
+          {error}
+        </div>
       )}
+
+      <div className="relative rounded-lg overflow-hidden bg-gray-100">
+        {isLoading ? (
+          <div className="flex items-center justify-center h-[200px]">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+          </div>
+        ) : reelUrl ? (
+          <video
+            src={reelUrl}
+            width={300}
+            height={200}
+            controls
+            className="w-full"
+            onError={() => setError('Failed to load video. Please try again.')}
+          />
+        ) : null}
+      </div>
     </div>
   );
 };

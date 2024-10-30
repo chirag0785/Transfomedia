@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import '.././globals.css';
 import Sidebar from "@/components/Sidebar";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
     title: "Create Next App",
@@ -13,17 +15,23 @@ export default function HomeLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <div className="flex min-h-screen bg-gray-100">
+        <div className="flex pt-16 flex-col min-h-screen bg-gray-100">
+            
+            <Navbar />
 
-            <div className="w-1/4 bg-gray-800 text-white p-6">
-                <Sidebar />
+            <div className="flex flex-1">
+                
+                <aside className="w-50 bg-gray-800 text-white hidden md:block">
+                    <Sidebar />
+                </aside>
+
+                
+                <main className="flex-1 p-6 bg-white shadow-lg rounded-lg m-4">
+                    {children}
+                </main>
             </div>
 
-            <div className="flex-1 p-6 bg-slate-600">
-                {children}
-            </div>
+            <Footer/>
         </div>
-
-
     );
 }

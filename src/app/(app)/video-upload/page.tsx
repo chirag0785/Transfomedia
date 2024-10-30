@@ -1,7 +1,8 @@
 "use client"
+import { useAuth } from '@clerk/nextjs';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 const Page = () => {
   const [title, setTitle] = useState('');
@@ -9,6 +10,7 @@ const Page = () => {
   const [video, setVideo] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const router = useRouter();
+  const {userId}=useAuth();
   const MAX_FILE_SIZE = 70 * 1024 * 1024
   const uploadVideoHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -42,6 +44,13 @@ const Page = () => {
       setIsUploading(false);
     }
   }
+
+  useEffect(()=>{
+    if(!userId){
+      router.refresh();
+      router.push('/')
+    }
+  },[userId])
   return (
     <div className="flex items-center justify-center min-h-screen">
       

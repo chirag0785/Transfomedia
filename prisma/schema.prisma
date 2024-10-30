@@ -20,9 +20,70 @@ model Video{
   originalSize String
   compressedSize String
   srtFileProcessingDone Boolean
-  reelTransformed Boolean?
+  user User @relation(fields: [userId], references: [id])
   userId String
   duration Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+model Subscription{
+  id String @id @default(cuid())
+  planName plans
+  price Float
+  creditsIssued Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  features Json
+  users User[]
+}
+model User {
+  id String @id @default(cuid())
+  name String
+  email String @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  profileImg String
+  credits Int @default(10)
+  tranformationsDone Int @default(0)
+  currentSubscription Subscription @relation(fields: [subscription_id], references: [id])
+  subscription_id String
+  isActive Boolean?
+  videos Video[]
+  images Image[]
+}
+
+model Image{
+  id String @id @default(cuid())
+  title String
+  url String
+  originalImgurl String
+  backgroundImgurl String?
+  aspectRatio String?
+  typeOfTransformation String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user User @relation(fields: [userId], references: [id])
+  userId String
+}
+
+model Testimonial{
+  id String @id @default(cuid())
+  name String
+  profileImg String
+  occupation String?
+  hallOfFame Boolean @default(false)
+  text String
+  rating Int
+  canBePubliclyShown Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum plans{
+  free
+  pro
+  standard
+}
+
+
+

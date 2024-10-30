@@ -4,7 +4,7 @@ import { getCldImageUrl, getCldVideoUrl } from 'next-cloudinary';
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { filesize } from 'filesize';
 import dayjs from 'dayjs';
-import { Clock, Download, Eye, FileDown, FileUp, Scissors, Wand } from 'lucide-react';
+import { Clock, Download, Eye, FileDown, FileUp, MailIcon, Scissors, Wand } from 'lucide-react';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
@@ -12,9 +12,8 @@ import { useRouter } from 'next/navigation';
 dayjs.extend(relativeTime);
 interface VideoCardProps {
   video: Video;
-  onDownload: (url: string, title: string) => void
 }
-const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
+const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const [srtFileUrl, setSrtFileUrl] = useState<string>("");
   const getFullVideoUrl = useCallback(() => {
     return getCldVideoUrl({
@@ -39,23 +38,22 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
   const getThumbnailUrl = useCallback(() => {
     return getCldImageUrl({
       src: video.publicId,
-      width: '300',
-      height: '200',
+      width: 400,
+      height: 225,
       crop: 'fill',
       gravity: 'auto',
       quality: 'auto',
-      assetType: 'video'
+      assetType: 'video',
+      format:'jpg'
     })
   }, []);
 
   const getVideoPreviewUrl = useCallback(() => {
     return getCldVideoUrl({
       src: video.publicId,
-      width: '300',
-      height: '200',
-      crop: 'fill',
-      gravity: 'auto',
-      quality: 'auto',
+      width: 1920,
+      height: 1080,
+      gravity:'auto',
       assetType: 'video',
       rawTransformations: ["e_preview:duration_15:max_seg_9:min_seg_dur_1"]
     });
@@ -157,17 +155,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
             Compression:{" "}
             <span className="text-accent">{getCompressionPercentage().toFixed(2)}%</span>
           </div>
-          <button
-            className="btn btn-primary btn-sm"
-            onClick={(ev) => {
-              ev.preventDefault();
-              onDownload(getFullVideoUrl(), video.title);
-            }}
-          >
-            <div className="tooltip" data-tip="Download Video">
-              <Download size={16} />
-            </div>
-          </button>
 
           <button
             className="btn btn-primary btn-sm"
@@ -190,8 +177,8 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
           <button
             className="btn btn-secondary btn-sm"
           >
-            <div className="tooltip" data-tip="Download SRT File">
-            <Download size={16} />
+            <div className="tooltip" data-tip="Email Srt file">
+            <MailIcon size={16} />
             </div>
           </button>
         </div>

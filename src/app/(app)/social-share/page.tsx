@@ -1,6 +1,8 @@
 "use client"
+import { useAuth } from '@clerk/nextjs';
 import axios from 'axios';
 import { CldImage } from 'next-cloudinary';
+import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react'
 
 const socialFormats = {
@@ -20,13 +22,19 @@ const Page = () => {
   const [isTransforming, setIsTransforming] = useState<boolean>(false);
 
   const imageRef = useRef<HTMLImageElement>(null);
-
+  const {userId}=useAuth();
+  const router=useRouter();
   useEffect(() => {
     if (uploadedImage) {
       setIsTransforming(true);
     }
   }, [uploadedImage, selectedFormat])
-
+  useEffect(() => {
+    if(!userId){
+      router.refresh();
+      router.push('/');
+    }
+  },[userId]);
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] || null;
     if (!file) return;
