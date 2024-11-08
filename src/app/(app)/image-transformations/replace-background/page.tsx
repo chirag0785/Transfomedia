@@ -32,6 +32,7 @@ import { User } from "@prisma/client";
 import InsufficientCreditBalance from "@/components/InsufficientCreditBalance";
 import DownloadImage from "@/components/DownloadImage";
 import { Skeleton } from "@/components/ui/skeleton";
+import TestimonialInput from "@/components/TestimonialInput";
 const Page = () => {
     const [imgPublicId, setImgPublicId] = useState("");
     const [backgroundImgPublicId, setBackgroundImgPublicId] = useState("");
@@ -40,8 +41,9 @@ const Page = () => {
     const [transformationApplied, setIsTransformationApplied] = useState(false);
     const [isTransforming, setIsTransforming] = useState(false);
     const [transformedUrl, setTransformedUrl] = useState("");
-    const { userId } = useAuth();
+    const { userId,isLoaded } = useAuth();
     const router = useRouter();
+    const testimonialRef=useRef<HTMLButtonElement>(null);
     const [user, setUser] = useState<User>()
     const form = useForm<z.infer<typeof transformationSchema>>({
         resolver: zodResolver(transformationSchema),
@@ -91,7 +93,17 @@ const Page = () => {
                     setIsTransforming(false);
                     axios.post(`/api/update-credits`)
                         .then((response) => response.data)
-                        .then((data) => setUser(data.user))
+                        .then((data) => {
+                            setUser(data.user);
+                            const tranformationsDone = data.user.tranformationsDone;
+                            if (tranformationsDone == 1 || (tranformationsDone != 0 && tranformationsDone % 5 == 0)) {
+                                setTimeout(() => {
+                                    if (testimonialRef) {
+                                        testimonialRef.current?.click();
+                                    }
+                                }, 3000)
+                            }
+                        })
                         .catch((err) => {
                             alert('Error updating credits');
                             console.error(err);
@@ -158,11 +170,14 @@ const Page = () => {
     }
 
     useEffect(() => {
-        if(!userId){
-          router.refresh();
-          router.push('/');
-        }
+        if(userId){
           fetchUser();
+        }
+
+        if(!userId && isLoaded){
+            router.refresh();
+            router.push('/');
+        }
       },[userId]);
 
 
@@ -171,32 +186,32 @@ const Page = () => {
     return (
         <>
             {!user && <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6">
-            <div className="max-w-7xl mx-auto space-y-8">
-                {/* Header Section */}
-                <div className="text-center space-y-4">
-                    <Skeleton className="mx-auto bg-gray-200 rounded-lg text-4xl md:text-5xl h-10 w-3/4" />
-                    <Skeleton className="mx-auto bg-gray-200 rounded-lg text-lg h-6 w-2/3" />
-                    <Skeleton className="mx-auto bg-gray-200 rounded-lg text-lg h-6 w-2/3" />
-                </div>
-
-                {/* Main Content */}
-                <div className="grid lg:grid-cols-2 gap-8">
-                    {/* Left Column - Source Images */}
-                    <div className="space-y-6">
-                        <Skeleton className="rounded-lg shadow-md bg-gray-200 h-40 w-full" />
-                        <Skeleton className="rounded-lg bg-gray-200 h-12 w-1/2" />
-                        <Skeleton className="rounded-lg shadow-md bg-gray-200 h-40 w-full" />
-                        <Skeleton className="rounded-lg bg-gray-200 h-12 w-1/2" />
+                <div className="max-w-7xl mx-auto space-y-8">
+                    {/* Header Section */}
+                    <div className="text-center space-y-4">
+                        <Skeleton className="mx-auto bg-gray-200 rounded-lg text-4xl md:text-5xl h-10 w-3/4" />
+                        <Skeleton className="mx-auto bg-gray-200 rounded-lg text-lg h-6 w-2/3" />
+                        <Skeleton className="mx-auto bg-gray-200 rounded-lg text-lg h-6 w-2/3" />
                     </div>
 
-                    {/* Right Column - Transformed Result */}
-                    <div className="space-y-6">
-                        <Skeleton className="rounded-lg shadow-md bg-gray-200 h-40 w-full" />
-                        <Skeleton className="rounded-lg bg-gray-200 h-12 w-1/2" />
+                    {/* Main Content */}
+                    <div className="grid lg:grid-cols-2 gap-8">
+                        {/* Left Column - Source Images */}
+                        <div className="space-y-6">
+                            <Skeleton className="rounded-lg shadow-md bg-gray-200 h-40 w-full" />
+                            <Skeleton className="rounded-lg bg-gray-200 h-12 w-1/2" />
+                            <Skeleton className="rounded-lg shadow-md bg-gray-200 h-40 w-full" />
+                            <Skeleton className="rounded-lg bg-gray-200 h-12 w-1/2" />
+                        </div>
+
+                        {/* Right Column - Transformed Result */}
+                        <div className="space-y-6">
+                            <Skeleton className="rounded-lg shadow-md bg-gray-200 h-40 w-full" />
+                            <Skeleton className="rounded-lg bg-gray-200 h-12 w-1/2" />
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>}
+            </div>}
             {user && (
                 <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6">
                     <div className="max-w-7xl mx-auto space-y-8">
@@ -209,6 +224,7 @@ const Page = () => {
                                 Transform your images with AI-powered background removal and replacement
                             </p>
                             <InsufficientCreditBalance triggerRef={triggerRef} />
+                            <TestimonialInput triggerRef={testimonialRef} name={user.name} profileImg={user.profileImg} />
                         </div>
 
                         {/* Main Content */}

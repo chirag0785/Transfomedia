@@ -1,8 +1,8 @@
 "use client";
 import Link from "next/link";
 import React from "react";
-import { Home, Share2, Upload, ImagePlus } from "lucide-react";
-import { FaHome, FaShareSquare, FaUpload, FaImage } from 'react-icons/fa';
+import { Coins, Home, Share2, Upload } from "lucide-react";
+import { ImagePlus, Image as ImageIcon, Sliders, Filter } from "lucide-react";
 
 const Sidebar = () => {
   return (
@@ -11,7 +11,7 @@ const Sidebar = () => {
       <div className="drawer-content flex flex-col items-center justify-center">
         <label
           htmlFor="my-drawer-2"
-          className="btn btn-primary drawer-button lg:hidden fixed top-4 left-4 z-50"
+          className="btn bg-purple-600 hover:bg-purple-700 text-white drawer-button lg:hidden fixed top-4 left-4 z-50"
         >
           Open drawer
         </label>
@@ -22,81 +22,49 @@ const Sidebar = () => {
           aria-label="close sidebar"
           className="drawer-overlay"
         ></label>
-        <ul className="menu bg-gray-900 text-white min-h-full w-80 p-4 space-y-2 shadow-xl border-r border-gray-800">
-          <li className="hover:bg-gray-800/80 rounded-lg transition-colors duration-200">
+        <ul className="menu bg-gradient-to-b from-purple-100 to-blue-50 text-gray-800 min-h-full w-80 p-4 space-y-2 shadow-xl border-r border-gray-200">
+          <li className="hover:bg-gradient-to-r from-purple-500 to-blue-500 hover:text-white rounded-lg transition-all duration-300">
             <Link href="/home" className="flex items-center gap-3 px-4 py-3 w-full">
-              <Home size={20} className="text-gray-400" />
+              <Home size={20} className="text-indigo-600" />
               <span className="font-medium">Home</span>
             </Link>
           </li>
-          <li className="hover:bg-gray-800/80 rounded-lg transition-colors duration-200">
+          <li className="hover:bg-gradient-to-r from-purple-500 to-blue-500 hover:text-white rounded-lg transition-all duration-300">
             <Link href="/social-share" className="flex items-center gap-3 px-4 py-3 w-full">
-              <Share2 size={20} className="text-gray-400" />
+              <Share2 size={20} className="text-blue-500" />
               <span className="font-medium">Social Share</span>
             </Link>
           </li>
-          <li className="hover:bg-gray-800/80 rounded-lg transition-colors duration-200">
+          <li className="hover:bg-gradient-to-r from-purple-500 to-blue-500 hover:text-white rounded-lg transition-all duration-300">
             <Link href="/video-upload" className="flex items-center gap-3 px-4 py-3 w-full">
-              <Upload size={20} className="text-gray-400" />
+              <Upload size={20} className="text-emerald-500" />
               <span className="font-medium">Video Upload</span>
             </Link>
           </li>
-          <li className="dropdown hover:bg-gray-800/80 rounded-lg transition-colors duration-200">
-            <div
-              tabIndex={0}
-              role="button"
-              className="flex items-center justify-between px-4 py-3 w-full cursor-pointer"
-            >
-              <div className="flex items-center gap-3">
-                <ImagePlus size={20} className="text-gray-400" />
-                <span className="font-medium">Image Transformations</span>
-              </div>
-              <svg 
-                className="w-4 h-4 text-gray-400 transition-transform duration-200 group-hover:rotate-180" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-            <ul
-              tabIndex={0}
-              className="dropdown-content menu bg-gray-800 rounded-lg z-[1] w-full mt-2 p-2 space-y-1 shadow-lg border border-gray-700"
-            >
-              <li className="hover:bg-gray-700/80 rounded-md transition-colors duration-200">
-                <Link
-                  className="px-4 py-2 text-sm w-full"
-                  href="/image-transformations/replace-background"
-                >
-                  Replace Background
-                </Link>
-              </li>
-              <li className="hover:bg-gray-700/80 rounded-md transition-colors duration-200">
-                <Link
-                  className="px-4 py-2 text-sm w-full"
-                  href="/image-transformations/grayscale"
-                >
-                  Grayscale
-                </Link>
-              </li>
-              <li className="hover:bg-gray-700/80 rounded-md transition-colors duration-200">
-                <Link
-                  className="px-4 py-2 text-sm w-full"
-                  href="/image-transformations/generative-restore"
-                >
-                  Generative Restore
-                </Link>
-              </li>
-              <li className="hover:bg-gray-700/80 rounded-md transition-colors duration-200">
-                <Link
-                  className="px-4 py-2 text-sm w-full"
-                  href="/image-transformations/generative-fill"
-                >
-                  Generative Fill
-                </Link>
-              </li>
-            </ul>
+
+          <li className="hover:bg-gradient-to-r from-purple-500 to-blue-500 hover:text-white rounded-lg transition-all duration-300">
+            <Link href="/image-transformations/replace-background" className="flex items-center gap-3 px-4 py-3 w-full">
+              <ImagePlus size={20} className="text-pink-500" />
+              <span className="font-medium">Replace Background</span>
+            </Link>
+          </li>
+          <li className="hover:bg-gradient-to-r from-purple-500 to-blue-500 hover:text-white rounded-lg transition-all duration-300">
+            <Link href="/image-transformations/generative-restore" className="flex items-center gap-3 px-4 py-3 w-full">
+              <Sliders size={20} className="text-orange-500" />
+              <span className="font-medium">Generative Restore</span>
+            </Link>
+          </li>
+          <li className="hover:bg-gradient-to-r from-purple-500 to-blue-500 hover:text-white rounded-lg transition-all duration-300">
+            <Link href="/image-transformations/generative-fill" className="flex items-center gap-3 px-4 py-3 w-full">
+              <Filter size={20} className="text-teal-500" />
+              <span className="font-medium">Generative Fill</span>
+            </Link>
+          </li>
+          <li className="hover:bg-gradient-to-r from-purple-500 to-blue-500 hover:text-white rounded-lg transition-all duration-300">
+            <Link href="/usage-and-pricing" className="flex items-center gap-3 px-4 py-3 w-full">
+              <Coins size={20} className="text-yellow-500" />
+              <span className="font-medium">Buy Credits</span>
+            </Link>
           </li>
         </ul>
       </div>

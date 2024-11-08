@@ -22,7 +22,7 @@ const Page = () => {
   const [isTransforming, setIsTransforming] = useState<boolean>(false);
 
   const imageRef = useRef<HTMLImageElement>(null);
-  const {userId}=useAuth();
+  const {userId,isLoaded}=useAuth();
   const router=useRouter();
   useEffect(() => {
     if (uploadedImage) {
@@ -30,9 +30,10 @@ const Page = () => {
     }
   }, [uploadedImage, selectedFormat])
   useEffect(() => {
-    if(!userId){
+    if(!userId && isLoaded){
       router.refresh();
       router.push('/');
+      return;
     }
   },[userId]);
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {

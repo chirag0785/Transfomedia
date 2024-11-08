@@ -26,15 +26,17 @@ import InsufficientCreditBalance from '@/components/InsufficientCreditBalance';
 import { User } from '@prisma/client';
 import DownloadImage from '@/components/DownloadImage';
 import { Skeleton } from '@/components/ui/skeleton';
+import TestimonialInput from '@/components/TestimonialInput';
 const Page = () => {
   const [imgPublicId, setImgPublicId] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [transformedUrl, setTransformedUrl] = useState('');
   const [isTransforming, setIsTransforming] = useState(false);
   const [transformationApplied, setIsTransformationApplied] = useState(false);
-  const { userId } = useAuth();
+  const { userId ,isLoaded} = useAuth();
   const router = useRouter();
   const [user, setUser] = useState<User>();
+  const testimonialRef=useRef<HTMLButtonElement>(null);
   const form = useForm<z.infer<typeof transformationSchema>>({
     resolver: zodResolver(transformationSchema),
     defaultValues: {
@@ -67,7 +69,17 @@ const Page = () => {
         setIsTransforming(false);
         axios.post(`/api/update-credits`)
         .then((response)=> response.data)
-        .then((data)=> setUser(data.user))
+        .then((data)=> {
+          setUser(data.user);
+          const tranformationsDone=data.user.tranformationsDone;
+          if(tranformationsDone==1 || (tranformationsDone!=0 && tranformationsDone%5==0)){
+            setTimeout(()=>{
+              if(testimonialRef){
+                testimonialRef.current?.click();
+              }
+            },3000)
+          }
+        })
         .catch((err)=>{
           alert('Error updating credits');
           console.error(err);
@@ -134,11 +146,13 @@ const Page = () => {
   }
 
   useEffect(() => {
-    if(!userId){
+    if(userId){
+      fetchUser();
+    }
+    if(!userId && isLoaded){
       router.refresh();
       router.push('/');
-    }
-      fetchUser();
+  }
   },[userId]);
 
 
@@ -199,6 +213,7 @@ const Page = () => {
                 Transform and restore your images using advanced AI technology. Upload an image to get started.
               </p>
               <InsufficientCreditBalance triggerRef={triggerRef} />
+              <TestimonialInput triggerRef={testimonialRef} name={user.name} profileImg={user.profileImg}/>
             </div>
 
             {/* Main Form Section */}
@@ -235,7 +250,7 @@ const Page = () => {
                           <FormItem>
                             <FormLabel className="text-lg font-semibold text-gray-700">Source Image</FormLabel>
                             <FormControl>
-                              <div className="h-72 relative rounded-xl overflow-hidden border-2 border-purple-400 border-dashed hover:border-purple-600 transition-colors">
+                              <div className="h-72 relative rounded-xl border-2 border-purple-400 border-dashed hover:border-purple-600 transition-colors">
                                 {!imgPublicId && isUploading && (
                                   <div className="absolute inset-0 flex items-center justify-center bg-white/90 backdrop-blur-sm">
                                     <Loader2 className="animate-spin text-purple-500" size={32} />
@@ -273,7 +288,7 @@ const Page = () => {
                           <FormItem>
                             <FormLabel className="text-lg font-semibold text-gray-700">Transformed Image</FormLabel>
                             <FormControl>
-                              <div className="h-72 relative rounded-xl overflow-hidden bg-gray-50 border-2 border-blue-200 shadow-lg">
+                              <div className="h-72 relative rounded-xl  bg-gray-50 border-2 border-blue-200 shadow-lg">
                                 {transformationApplied && !isTransforming && (
                                   <div className="relative w-full h-full">
                                   <img

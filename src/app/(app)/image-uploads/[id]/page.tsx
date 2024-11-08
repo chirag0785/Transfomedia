@@ -16,7 +16,7 @@ const page = ({ params }: { params: { id: string } }) => {
     const [transformedUrl, setTransformedUrl] = useState('');
     const [aspectRatio, setAspectRatio] = useState('');
     const [title, setTitle] = useState('');
-    const { userId } = useAuth();
+    const { userId ,isLoaded} = useAuth();
     const [user, setUser] = useState<User>();
     const router=useRouter();
     const triggerRef = useRef<HTMLButtonElement>(null);
@@ -128,11 +128,14 @@ const page = ({ params }: { params: { id: string } }) => {
     }
 
     useEffect(() => {
-        if(!userId){
+        if(!userId && isLoaded){
           router.refresh();
           router.push('/');
+          return;
         }
-          fetchUser();
+        if(userId){
+            fetchUser();
+        }
       },[userId]);
     return (
         <div>

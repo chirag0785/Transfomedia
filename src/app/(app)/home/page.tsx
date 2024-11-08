@@ -10,8 +10,12 @@ import { useToast } from '@/hooks/use-toast';
 import ImageCard from '@/components/ImageCard';
 import DownloadImage from '@/components/DownloadImage';
 import { getCldVideoUrl } from 'next-cloudinary';
+import { supabase } from '@/lib/supabase';
+interface VideosContent extends Video{
+  srtFileProcessingDone:boolean
+}
 const Home = () => {
-  const [videos, setVideos] = useState<Video[]>([]);
+  const [videos, setVideos] = useState<VideosContent[]>([]);
   const [images, setImages] = useState<Image[]>([]);
   const searchParams = useSearchParams();
   const imagePageNumber = searchParams.get('image') || "1";
@@ -19,7 +23,7 @@ const Home = () => {
   const [moreVideoContentLeft, setMoreVideoContentLeft] = useState(false);
   const [moreImageContentLeft, setMoreImageContentLeft] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { userId } = useAuth();
+  const { userId ,isLoaded } = useAuth();
   const router=useRouter();
   const { toast } = useToast();
   const fetchVideos = async () => {
@@ -28,6 +32,8 @@ const Home = () => {
       const response = await axios.get(`/api/videos?page=${videoPageNumber}`);
       setVideos(response.data.videos);
       setLoading(false);
+      console.log(response.data.videos);
+      
       setMoreVideoContentLeft(response.data.moreVideoContentLeft);
     } catch (err) {
       console.log(err);
@@ -57,8 +63,10 @@ const Home = () => {
   }
 
   const getVideoUrl = useCallback((publicId: string) => {
+    console.log(publicId);
+    
     return getCldVideoUrl({
-      src: publicId
+      src: publicId,
     })
   }, [userId])
   useEffect(() => {
@@ -69,9 +77,36 @@ const Home = () => {
   }, [imagePageNumber,userId])
   
   useEffect(()=>{
-    if(!userId){
+    if(!userId && isLoaded){
       router.refresh();
       router.push('/');
+      return;
+    }
+
+    const channel=supabase.channel('video-updates')
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'video' }, (payload) => {
+      console.log(payload);
+
+      if(payload.new.user_id===userId){
+        setVideos((prev)=>prev.map((video)=>{
+          if(video.publicId===payload.new.public_id){ 
+            const updatedVideo={...video};
+            updatedVideo.srtFileProcessingDone=payload.new.srt_file_processing_done;
+            toast({
+              title: 'Srt File Ready',
+              description: `Srt file for ${video.title} is ready`,
+            });
+            return updatedVideo
+          }
+          return video;
+        }))
+      }
+    })
+    .subscribe()
+
+
+    return ()=>{
+      channel.unsubscribe();
     }
   },[userId])
   return (
@@ -158,12 +193,13 @@ const Home = () => {
             videos.map((video) => (
               <div key={video.id} className="group relative">
                 <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300">
-                  <VideoCard video={video} />
+                  <VideoCard video={video}/>
                   <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     <DownloadImage 
                       typeOfTransformation=""
                       title={video.title}
-                      url={getVideoUrl(video.publicId)}
+                      url={getVideoUrl(video?.publicId || "")}
+                      fileExtension='mp4'
                     />
                   </div>
                 </div>

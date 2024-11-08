@@ -19,7 +19,6 @@ model Video{
   publicId String
   originalSize String
   compressedSize String
-  srtFileProcessingDone Boolean
   user User @relation(fields: [userId], references: [id])
   userId String
   duration Float

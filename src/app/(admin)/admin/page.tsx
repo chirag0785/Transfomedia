@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +18,7 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@clerk/nextjs';
+import axios from 'axios';
 
 interface StatCardProps {
   title: string;
@@ -26,6 +27,7 @@ interface StatCardProps {
   trend?: string;
   trendUp?: boolean;
 }
+
 
 const StatCard = ({ title, value, icon, trend, trendUp }: StatCardProps) => (
   <Card>
@@ -72,22 +74,35 @@ const QuickAction = ({ title, description, icon, href }: QuickActionProps) => (
     </Card>
   </Link>
 );
-
+interface Stats{
+  totalUsers: string;
+  activeUsers: string;
+  testimonials: string;
+  avgRating: string;
+}
 const AdminDashboard = () => {
   const router = useRouter();
-  const {userId}=useAuth();
+  const {userId,isLoaded}=useAuth();
   useEffect(()=>{
-    if(!userId){
+    if(!userId && isLoaded){
       router.refresh();
       router.push('/');
+      return;
     }
+
+    if(userId){
+      fetchStats()
+    }
+
   },[userId])
-  // In a real app, these would come from your API/database
-  const stats = {
-    totalUsers: "1,234",
-    activeUsers: "892",
-    testimonials: "156",
-    averageRating: "4.8"
+  const [stats,setStats] = useState<Stats>({ totalUsers: '0', activeUsers: '0', testimonials: '0', avgRating: '0' });
+  const fetchStats = async () => {
+    try {
+      const response = await axios.get('/api/get-admin-stats');
+      setStats(response.data.stats);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -132,7 +147,7 @@ const AdminDashboard = () => {
           />
           <StatCard
             title="Average Rating"
-            value={stats.averageRating}
+            value={stats.avgRating}
             icon={<Star className="h-6 w-6 text-yellow-500" />}
           />
         </div>

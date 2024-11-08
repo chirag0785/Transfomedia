@@ -7,8 +7,9 @@ type DownloadImageProps = {
     title: string,
     typeOfTransformation: string,
     aspectRatio?: string,
+    fileExtension?:string
 }
-const DownloadImage = ({ url, title, typeOfTransformation, aspectRatio }: DownloadImageProps) => {
+const DownloadImage = ({ url, title, typeOfTransformation, aspectRatio,fileExtension='png' }: DownloadImageProps) => {
     const downloadImage = () => {
         fetch(url) //fetches buffer response
             .then((response) => response.blob())
@@ -17,7 +18,7 @@ const DownloadImage = ({ url, title, typeOfTransformation, aspectRatio }: Downlo
                 const a = document.createElement('a');
                 a.style.display = 'none';
                 a.href = url;
-                a.download = `${title.replace(/\s+/g, '-').toLowerCase()}_${typeOfTransformation}${aspectRatio ? `_${aspectRatio}` : ''}_${new Date().toISOString().split('T')[0]}.png`;
+                a.download = `${title.replace(/\s+/g, '-').toLowerCase()}_${typeOfTransformation}${aspectRatio ? `_${aspectRatio}` : ''}_${new Date().toISOString().split('T')[0]}.${fileExtension}`;
                 document.body.appendChild(a);
                 a.click();
                 window.URL.revokeObjectURL(url);

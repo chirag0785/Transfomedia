@@ -13,6 +13,7 @@ type TestimonialCardProps={
 }
 
 const TestimonialCard = ({ testimonial, onHallOfFameToggle,toggleDisable }: TestimonialCardProps) => {
+  const [checkedValue, setCheckedValue] = React.useState(testimonial.hallOfFame);
   return (
     <Card className="hover:bg-accent/50 transition-colors">
       <CardContent className="p-4">
@@ -51,8 +52,11 @@ const TestimonialCard = ({ testimonial, onHallOfFameToggle,toggleDisable }: Test
             <div className="flex items-center gap-2">
               <Trophy size={16} className={testimonial.hallOfFame ? "text-yellow-500" : "text-muted-foreground"} />
               <Switch 
-                checked={testimonial.hallOfFame}
-                onCheckedChange={(checked: boolean) => onHallOfFameToggle(testimonial.id, checked)}
+                checked={checkedValue}
+                onCheckedChange={(checked: boolean) =>{
+                  onHallOfFameToggle(testimonial.id, checked);
+                  setCheckedValue(!checkedValue);
+                }}
                 className="data-[state=checked]:bg-yellow-500"
                 disabled={toggleDisable}
               />

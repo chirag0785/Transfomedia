@@ -19,7 +19,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { useRouter } from 'next/navigation';
 
 const Page = () => {
-  const { userId } = useAuth();
+  const { userId,isLoaded } = useAuth();
   const [user, setUser] = useState<User>();
   const [subscriptionPlans, setSubscriptionPlans] = useState<Subscription[]>([]);
   const router=useRouter();
@@ -57,7 +57,7 @@ const Page = () => {
     }
   }
   useEffect(() => {
-    if(userId){
+    if(!userId && isLoaded){
         router.refresh();
         router.push('/');
         return;
@@ -83,8 +83,10 @@ const Page = () => {
       }
     };
 
-    fetchUser();
-    fetchSubscriptionPlans();
+    if(userId){
+      fetchUser();
+      fetchSubscriptionPlans();
+    }
   }, [userId]);
 
   const UserStats = () => (

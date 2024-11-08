@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -28,6 +28,7 @@ import { Textarea } from "@/components/ui/textarea";
 import StarRating from "./StarRating";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
+import { DialogClose } from "@radix-ui/react-dialog";
 type TestimonialInputProps = {
   name: string;
   profileImg: string;
@@ -59,6 +60,7 @@ const TestimonialInput = ({
         })
         .then((response)=> response.data)
         .then((data)=>{
+            
             toast({
                 title:'Success',
                 description:'Testimonial added successfully'
@@ -71,7 +73,13 @@ const TestimonialInput = ({
                 variant:'destructive'
             })
         })
+        .finally(()=>{
+          if(buttonRef){
+            buttonRef.current?.click()
+          }
+        })
   }
+  const buttonRef=useRef<HTMLButtonElement>(null);
   return (
     <Dialog>
       <DialogTrigger hidden ref={triggerRef}>
@@ -155,6 +163,9 @@ const TestimonialInput = ({
                     </FormItem>
                   )}
                 />
+                <DialogClose ref={buttonRef} hidden>
+
+                </DialogClose>
                 <Button type="submit">Submit</Button>
               </form>
             </Form>

@@ -1,6 +1,5 @@
-"use client"
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Maximize2, ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -18,14 +17,13 @@ const ImageGallery = () => {
   const [isComparing, setIsComparing] = useState(false);
   const [comparePosition, setComparePosition] = useState(50);
 
-  
   const transformations: TransformationType[] = [
     {
       id: '1',
-      title: 'Background Removal',
-      description: 'Professional product shot with background removed',
-      beforeImg: '/before1.jpg',
-      afterImg: '/after1.jpg',
+      title: 'Replace Background',
+      description: 'Professional product shot with background replacement',
+      beforeImg: '/images/before-replace-background.webp',
+      afterImg: '/images/after-replace-background.png',
       category: 'Background'
     },
     {
@@ -40,12 +38,21 @@ const ImageGallery = () => {
       id: '3',
       title: 'Generative Fill',
       description: 'Fill missing areas with AI-generated content',
-      beforeImg: '/before3.jpg',
-      afterImg: '/after3.jpg',
+      beforeImg: '/images/before-generative-fill.webp',
+      afterImg: '/images/after-generative-fill.png',
       category: 'Resize'
-    },
-    
+    }
   ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveIndex((prev) =>
+        prev === transformations.length - 1 ? 0 : prev + 1
+      );
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [transformations.length]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!isComparing) return;
@@ -56,13 +63,13 @@ const ImageGallery = () => {
   };
 
   const nextImage = () => {
-    setActiveIndex((prev) => 
+    setActiveIndex((prev) =>
       prev === transformations.length - 1 ? 0 : prev + 1
     );
   };
 
   const prevImage = () => {
-    setActiveIndex((prev) => 
+    setActiveIndex((prev) =>
       prev === 0 ? transformations.length - 1 : prev - 1
     );
   };
@@ -70,10 +77,10 @@ const ImageGallery = () => {
   const activeTransformation = transformations[activeIndex];
 
   return (
-    <div className="max-w-6xl mx-auto px-4">
+    <div className="mx-auto px-4">
       <div className="grid md:grid-cols-2 gap-8 items-center">
         <div className="space-y-6">
-          <motion.h3 
+          <motion.h3
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             key={activeTransformation.id}
@@ -118,23 +125,39 @@ const ImageGallery = () => {
               onMouseLeave={() => setIsComparing(false)}
               onMouseMove={handleMouseMove}
             >
-              <div className="absolute inset-0">
-                <img 
-                  src={activeTransformation.beforeImg} 
-                  alt="Before" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div
-                className="absolute inset-0"
-                style={{ clipPath: `inset(0 ${100 - comparePosition}% 0 0)` }}
-              >
-                <img 
-                  src={activeTransformation.afterImg} 
-                  alt="After" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
+              <AnimatePresence>
+                <motion.div
+                  key={`before-${activeTransformation.id}`}
+                  initial={{ x: '-100%' }}
+                  animate={{ x: 0 }}
+                  exit={{ x: '100%' }}
+                  transition={{ duration: 0.5 }}
+                  className="absolute inset-0"
+                >
+                  <img
+                    src={activeTransformation.beforeImg}
+                    alt="Before"
+                    className="w-full h-full object-cover"
+                  />
+                </motion.div>
+              </AnimatePresence>
+              <AnimatePresence>
+                <motion.div
+                  key={`after-${activeTransformation.id}`}
+                  initial={{ x: '100%' }}
+                  animate={{ x: 0 }}
+                  exit={{ x: '-100%' }}
+                  transition={{ duration: 0.5 }}
+                  className="absolute inset-0"
+                  style={{ clipPath: `inset(0 ${100 - comparePosition}% 0 0)` }}
+                >
+                  <img
+                    src={activeTransformation.afterImg}
+                    alt="After"
+                    className="w-full h-full object-cover"
+                  />
+                </motion.div>
+              </AnimatePresence>
               <div
                 className="absolute inset-y-0 w-1 bg-white cursor-ew-resize"
                 style={{ left: `${comparePosition}%` }}
@@ -167,8 +190,8 @@ const ImageGallery = () => {
             }`}
             onClick={() => setActiveIndex(index)}
           >
-            <img 
-              src={transform.afterImg} 
+            <img
+              src={transform.afterImg}
               alt={transform.title}
               className="w-full h-24 object-cover"
             />

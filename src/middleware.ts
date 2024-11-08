@@ -11,7 +11,8 @@ const isPublicApiRoute = createRouteMatcher([
     '/api/video-upload-notification',
     '/api/webhook',
     '/api/stripe-webhook',
-    '/api/get-subscription-plans'
+    '/api/get-subscription-plans',
+    '/api/get-hall-of-fame-testimonials',
 ])
 export default clerkMiddleware((auth, req) => {
     const {userId,sessionClaims}=auth();

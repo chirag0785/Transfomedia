@@ -29,9 +29,9 @@ const TestimonialsPage = () => {
   const [toggleDisable, setToggleDisable] = useState(false);
   const [sortBy, setSortBy] = useState("newest");
   const router = useRouter();
-  const {userId}=useAuth();
+  const {userId,isLoaded}=useAuth();
   useEffect(()=>{
-    if(!userId){
+    if(!userId && isLoaded){
       router.refresh();
       router.push('/');
     }
@@ -63,7 +63,7 @@ const TestimonialsPage = () => {
   const onHallOfFameToggle = async (id: string, value: boolean) => {
     setToggleDisable(true);
     try {
-      await axios.post(`/api/toggle-hall-of-fame/${id}`, { value });
+      const response=await axios.post(`/api/toggle-hall-of-fame/${id}`, { value });
       toast({
         title: "Success",
         description: `Testimonial ${value ? "added to" : "removed from"} Hall of Fame`,
@@ -75,6 +75,7 @@ const TestimonialsPage = () => {
         description: "Could not update Hall of Fame status",
         variant: "destructive",
       });
+      return;
     } finally {
       setToggleDisable(false);
     }

@@ -34,6 +34,7 @@ import InsufficientCreditBalance from '@/components/InsufficientCreditBalance';
 import { User } from '@prisma/client';
 import DownloadImage from '@/components/DownloadImage';
 import { Skeleton } from '@/components/ui/skeleton';
+import TestimonialInput from '@/components/TestimonialInput';
 const Page = () => {
   const [imgPublicId, setImgPublicId] = useState('');
   const [isUploading, setIsUploading] = useState(false);
@@ -41,9 +42,11 @@ const Page = () => {
   const [isTransforming, setIsTransforming] = useState(false);
   const [transformationApplied, setIsTransformationApplied] = useState(false);
   const [aspectRatio, setAspectRatio] = useState('');
-  const { userId } = useAuth();
+  const { userId,isLoaded } = useAuth();
   const [user,setUser]=useState<User>();
   const router = useRouter();
+
+  const testimonialRef=useRef<HTMLButtonElement>(null);
   const form = useForm<z.infer<typeof transformationSchema>>({
     resolver: zodResolver(transformationSchema),
     defaultValues: {
@@ -63,7 +66,6 @@ const Page = () => {
             aspectRatio:aspectRatio,
             typeOfTransformation: "generativeFill",
         })
-
         .then((response)=> response.data)
         .then((data)=>{
             router.refresh();
@@ -87,8 +89,6 @@ const Page = () => {
       src: publicId,
       fillBackground: true,
       crop: 'fill',
-      width: aspectFormats[aspectRatio as keyof typeof aspectFormats].width,
-      height: aspectFormats[aspectRatio as keyof typeof aspectFormats].height,
       aspectRatio: aspectFormats[aspectRatio as keyof typeof aspectFormats].aspectRatio,
     });
 
@@ -103,7 +103,17 @@ const Page = () => {
         setIsTransforming(false);
         axios.post(`/api/update-credits`)
         .then((response)=> response.data)
-        .then((data)=> setUser(data.user))
+        .then((data)=>{
+          setUser(data.user);
+          const tranformationsDone=data.user.tranformationsDone;
+          if(tranformationsDone==1 || (tranformationsDone!=0 && tranformationsDone%5==0)){
+            setTimeout(()=>{
+              if(testimonialRef){
+                testimonialRef.current?.click();
+              }
+            },3000)
+          }
+        })
         .catch((err)=>{
           alert('Error updating credits');
           console.error(err);
@@ -151,11 +161,14 @@ const Page = () => {
   }
 
   useEffect(() => {
-    if(!userId){
+    if(userId){
+      fetchUser();
+    }
+    if(!userId && isLoaded){
       router.refresh();
       router.push('/');
+      return;
     }
-      fetchUser();
   },[userId]);
 
 
@@ -197,6 +210,7 @@ const Page = () => {
             </p>
   
             <InsufficientCreditBalance triggerRef={triggerRef}/>
+            <TestimonialInput triggerRef={testimonialRef} name={user.name} profileImg={user.profileImg}/>
           </div>
   
           <Card className="border-0 shadow-2xl bg-white/90 backdrop-blur-sm rounded-2xl">

@@ -10,7 +10,7 @@ const Page = () => {
   const [video, setVideo] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const router = useRouter();
-  const {userId}=useAuth();
+  const {userId,isLoaded}=useAuth();
   const MAX_FILE_SIZE = 70 * 1024 * 1024
   const uploadVideoHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -46,9 +46,10 @@ const Page = () => {
   }
 
   useEffect(()=>{
-    if(!userId){
+    if(!userId && isLoaded){
       router.refresh();
       router.push('/')
+      return;
     }
   },[userId])
   return (
