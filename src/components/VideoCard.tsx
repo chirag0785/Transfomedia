@@ -17,8 +17,6 @@ import {
 } from "lucide-react";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@clerk/nextjs";
-import { useToast } from "@/hooks/use-toast";
 import { downloadFile } from "@/helpers/downloadFile";
 
 interface VideosContent extends Video {

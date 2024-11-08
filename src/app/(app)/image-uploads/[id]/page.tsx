@@ -9,7 +9,7 @@ import { useAuth } from '@clerk/nextjs'
 import InsufficientCreditBalance from '@/components/InsufficientCreditBalance'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useRouter } from 'next/navigation'
-const page = ({ params }: { params: { id: string } }) => {
+const Page = ({ params }: { params: { id: string } }) => {
     const [imgDetails, setImgDetails] = useState<Image>();
     const [transformationApplied, setIsTransformationApplied] = useState(true);
     const [isTransforming, setIsTransforming] = useState(false);
@@ -213,4 +213,4 @@ const page = ({ params }: { params: { id: string } }) => {
     )
 }
 
-export default page
+export default Page

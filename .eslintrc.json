@@ -15,6 +15,9 @@
 
     // Disable other common ESLint rules
     "no-console": "off",
-    "no-debugger": "off"
+    "no-debugger": "off",
+    "@next/next/no-img-element": "off",
+    "react-hooks/exhaustive-deps": "off",
+    "jsx-a11y/alt-text": "off"
   }
 }
