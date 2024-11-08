@@ -4,7 +4,7 @@ import { useAuth } from '@clerk/nextjs';
 import { Image, Video } from '@prisma/client';
 import axios from 'axios'
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { Suspense, useCallback, useEffect, useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from '@/hooks/use-toast';
 import ImageCard from '@/components/ImageCard';
@@ -246,4 +246,11 @@ const Home = () => {
   )
 }
 
-export default Home
+const MyHome= () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Home />
+    </Suspense>
+  )
+}
+export default MyHome

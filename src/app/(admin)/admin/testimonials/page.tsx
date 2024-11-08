@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Testimonial } from "@prisma/client";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -181,4 +181,9 @@ const TestimonialsPage = () => {
   );
 };
 
-export default TestimonialsPage;
+const MyTestimonialPage= () => {
+  <Suspense fallback={<div>Loading...</div>}>
+    <TestimonialsPage />
+  </Suspense>
+}
+export default MyTestimonialPage;
