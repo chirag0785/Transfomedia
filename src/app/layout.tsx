@@ -9,6 +9,7 @@ import { Toaster } from "@/components/ui/toaster";
 import Footer from "@/components/Footer";
 import { usePathname } from "next/navigation";
 import {metadata} from "@/metadata/metadata"
+import Navbar from "@/components/Navbar";
 
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 />
             </head>
             <body style={{ fontFamily: 'Poppins, sans-serif' }}>
+                {path==='/' && <Navbar/>}
                 {children}
                 {path === '/' && <Footer />}
                 <Toaster />
