@@ -15,7 +15,7 @@ const ImageCard = ({ image }:ImageCardProps) => {
   };
 
   return (
-    <Card className="max-w-sm overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+    <Card className="overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
       <div className="relative">
         <img
           src={image.url}

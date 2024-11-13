@@ -27,6 +27,7 @@ import { User } from '@prisma/client';
 import DownloadImage from '@/components/DownloadImage';
 import { Skeleton } from '@/components/ui/skeleton';
 import TestimonialInput from '@/components/TestimonialInput';
+import { assignScreenSizes } from '@/utils/screenSizes';
 const Page = () => {
   const [imgPublicId, setImgPublicId] = useState('');
   const [isUploading, setIsUploading] = useState(false);
@@ -123,7 +124,6 @@ const Page = () => {
 
       .then((response) => response.data)
       .then((data) => {
-        router.refresh();
         router.push(`/image-uploads/${data.image.id}`);
       })
       .catch((err) => {
@@ -202,8 +202,8 @@ const Page = () => {
           </div>
         </div>}
       {user && (
-        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 p-6 md:p-12">
-          <div className="max-w-6xl mx-auto space-y-10">
+        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 p-6 md:p-12 w-full overflow-x-hidden">
+          <div className={`w-full mx-auto space-y-2 ${assignScreenSizes({ width: window.innerWidth })}`}>
             {/* Header Section with enhanced styling */}
             <div className="text-center space-y-6">
               <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">

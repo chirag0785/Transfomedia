@@ -1,4 +1,4 @@
-export const aspectFormats = {
+export const aspectFormats:Record<string, { width: number; height: number; aspectRatio: string }> = {
     "Square (1:1)": { width: 1080, height: 1080, aspectRatio: "1:1" },
     "Portrait (4:5)": { width: 1080, height: 1350, aspectRatio: "4:5" },
     "Widescreen (16:9)": { width: 1200, height: 675, aspectRatio: "16:9" },

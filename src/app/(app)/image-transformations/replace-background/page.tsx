@@ -33,6 +33,7 @@ import InsufficientCreditBalance from "@/components/InsufficientCreditBalance";
 import DownloadImage from "@/components/DownloadImage";
 import { Skeleton } from "@/components/ui/skeleton";
 import TestimonialInput from "@/components/TestimonialInput";
+import { assignScreenSizes } from "@/utils/screenSizes";
 const Page = () => {
     const [imgPublicId, setImgPublicId] = useState("");
     const [backgroundImgPublicId, setBackgroundImgPublicId] = useState("");
@@ -147,7 +148,6 @@ const Page = () => {
 
             .then((response) => response.data)
             .then((data) => {
-                router.refresh();
                 router.push(`/image-uploads/${data.image.id}`);
             })
             .catch((err) => {
@@ -213,8 +213,8 @@ const Page = () => {
                 </div>
             </div>}
             {user && (
-                <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6">
-                    <div className="max-w-7xl mx-auto space-y-8">
+                <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6 w-full overflow-x-hidden">
+                    <div className={`w-full mx-auto space-y-2 ${assignScreenSizes({ width: window.innerWidth })}`}>
                         {/* Header Section */}
                         <div className="text-center space-y-4">
                             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">

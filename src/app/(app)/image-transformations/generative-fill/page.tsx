@@ -27,7 +27,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { aspectFormats } from '@/utils/imageUtils';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import InsufficientCreditBalance from '@/components/InsufficientCreditBalance';
@@ -35,6 +34,14 @@ import { User } from '@prisma/client';
 import DownloadImage from '@/components/DownloadImage';
 import { Skeleton } from '@/components/ui/skeleton';
 import TestimonialInput from '@/components/TestimonialInput';
+import { assignScreenSizes } from '@/utils/screenSizes';
+const aspectFormats:Record<string, { width: number; height: number; aspectRatio: string }> = {
+  "Square (1:1)": { width: 1080, height: 1080, aspectRatio: "1:1" },
+  "Portrait (4:5)": { width: 1080, height: 1350, aspectRatio: "4:5" },
+  "Widescreen (16:9)": { width: 1200, height: 675, aspectRatio: "16:9" },
+  "Banner (3:1)": { width: 1500, height: 500, aspectRatio: "3:1" },
+  "Profile Cover (205:78)": { width: 820, height: 312, aspectRatio: "205:78" }
+};
 const Page = () => {
   const [imgPublicId, setImgPublicId] = useState('');
   const [isUploading, setIsUploading] = useState(false);
@@ -68,7 +75,6 @@ const Page = () => {
         })
         .then((response)=> response.data)
         .then((data)=>{
-            router.refresh();
             router.push(`/image-uploads/${data.image.id}`);
         })
         .catch((err)=>{
@@ -76,20 +82,21 @@ const Page = () => {
         })
   }
 
-  const getTransformedUrl = useCallback((publicId: string) => {
-    
+  const getTransformedUrl = useCallback((publicId: string,aspectRatio:string) => {
     if(user && user?.credits<2){
       if(triggerRef){
         triggerRef.current?.click();
       }
       return;
     }
+    console.log(aspectRatio);
+    
     
     const url = getCldImageUrl({
       src: publicId,
       fillBackground: true,
       crop: 'fill',
-      aspectRatio: aspectFormats[aspectRatio as keyof typeof aspectFormats].aspectRatio,
+      aspectRatio: aspectFormats[aspectRatio].aspectRatio,
     });
 
     setIsTransformationApplied(true);
@@ -195,8 +202,8 @@ const Page = () => {
           </div>
         </div>}
       {user && (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-6 md:p-12">
-        <div className="max-w-6xl mx-auto space-y-10">
+        <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-6 md:p-12 w-full overflow-x-hidden">
+        <div className={`w-full mx-auto space-y-2 ${assignScreenSizes({ width: window.innerWidth })}`}>
           <div className="text-center space-y-6">
             <div className="relative">
               <h1 className="text-6xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
@@ -354,7 +361,7 @@ const Page = () => {
   
                   <div className="space-y-6 pt-6">
                     <Button
-                      onClick={() => getTransformedUrl(imgPublicId)}
+                      onClick={() => getTransformedUrl(imgPublicId,form.getValues().aspectRatio || "")}
                       disabled={!imgPublicId || isTransforming || !aspectRatio}
                       type="button"
                       className="w-full h-14 text-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg"

@@ -29,13 +29,13 @@ const TestimonialsPage = () => {
   const [toggleDisable, setToggleDisable] = useState(false);
   const [sortBy, setSortBy] = useState("newest");
   const router = useRouter();
-  const {userId,isLoaded}=useAuth();
-  useEffect(()=>{
-    if(!userId && isLoaded){
+  const { userId, isLoaded } = useAuth();
+  useEffect(() => {
+    if (!userId && isLoaded) {
       router.refresh();
       router.push('/');
     }
-  },[userId])
+  }, [userId])
   const fetchTestimonials = async () => {
     setLoading(true);
     try {
@@ -63,7 +63,7 @@ const TestimonialsPage = () => {
   const onHallOfFameToggle = async (id: string, value: boolean) => {
     setToggleDisable(true);
     try {
-      const response=await axios.post(`/api/toggle-hall-of-fame/${id}`, { value });
+      const response = await axios.post(`/api/toggle-hall-of-fame/${id}`, { value });
       toast({
         title: "Success",
         description: `Testimonial ${value ? "added to" : "removed from"} Hall of Fame`,
@@ -181,8 +181,8 @@ const TestimonialsPage = () => {
   );
 };
 
-const MyTestimonialPage= () => {
-  <Suspense fallback={<div>Loading...</div>}>
+const MyTestimonialPage = () => {
+  return <Suspense fallback={<div>Loading...</div>}>
     <TestimonialsPage />
   </Suspense>
 }

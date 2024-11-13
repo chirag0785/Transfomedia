@@ -35,7 +35,6 @@ const Page = () => {
     formData.append('originalSize', originalSize);
     try {
       const response = await axios.post('/api/video-upload', formData);
-      router.refresh();
       router.push('/home');
     } catch (err) {
       console.log(err);

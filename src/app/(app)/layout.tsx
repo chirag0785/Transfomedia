@@ -15,12 +15,12 @@ export default function HomeLayout({
 
     <div className="flex flex-1">
         
-        <aside className="w-50 bg-[#cbc8e7f0] text-white hidden md:block">
+       
             <Sidebar />
-        </aside>
+       
 
         
-        <main className="flex-1 p-6 bg-[#E6E6FA] shadow-lg rounded-lg m-4">
+        <main className="flex-1 md:p-6 p-1 bg-[#E6E6FA] shadow-lg rounded-lg sm:m-4 w-full">
             {children}
         </main>
     </div>
