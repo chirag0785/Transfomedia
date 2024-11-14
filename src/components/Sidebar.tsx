@@ -6,6 +6,7 @@ import { Coins, Home, Share2, Upload, ImagePlus, Sliders, Filter } from "lucide-
 const Sidebar = () => {
   
   const [isOpen, setIsOpen] = useState(true);
+  const [width,setWidth]= useState(0);
   useLayoutEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 768) {
@@ -13,9 +14,11 @@ const Sidebar = () => {
       } else {
         setIsOpen(true);
       }
+      setWidth(window.innerWidth);
     };
     window.addEventListener('resize', handleResize);
     setIsOpen(window.innerWidth >= 768);
+    setWidth(window.innerWidth);
     return () => {
       window.removeEventListener('resize', handleResize);
     };
@@ -53,7 +56,7 @@ const Sidebar = () => {
       {/* Sidebar */}
       <aside
         id="default-sidebar"
-        className={`fixed top-${window.innerWidth >= 768 ? "0" : "20"} left-0 z-20 lg:w-50 sm:w-1/3 text-black ${isOpen ? "block" : "hidden"} md:relative`  }
+        className={`fixed top-${width >= 768 ? "0" : "20"} left-0 z-20 lg:w-50 sm:w-1/3 text-black ${isOpen ? "block" : "hidden"} md:relative`  }
         aria-label="Sidebar"
       >
         <div className="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
@@ -107,7 +110,7 @@ const Sidebar = () => {
         {/* Button to close the sidebar */}
         <button
           onClick={toggleSidebar}
-          hidden={window.innerWidth >= 768}
+          hidden={width >= 768}
           className={`absolute top-0 left-4 z-10 p-2 bg-red-500 text-white rounded-lg`}
         >
           X
