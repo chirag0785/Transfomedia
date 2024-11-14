@@ -1,12 +1,12 @@
 "use client";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useLayoutEffect } from "react";
 import { Coins, Home, Share2, Upload, ImagePlus, Sliders, Filter } from "lucide-react";
 
 const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(window.innerWidth >= 768);
-
-  useEffect(() => {
+  
+  const [isOpen, setIsOpen] = useState(true);
+  useLayoutEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 768) {
         setIsOpen(false);
@@ -15,7 +15,7 @@ const Sidebar = () => {
       }
     };
     window.addEventListener('resize', handleResize);
-
+    setIsOpen(window.innerWidth >= 768);
     return () => {
       window.removeEventListener('resize', handleResize);
     };

@@ -1,5 +1,5 @@
 "use client"
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@clerk/nextjs';
 import { Loader2, Wand2, RefreshCw, ImageDown } from 'lucide-react';
@@ -52,6 +52,7 @@ const Page = () => {
   const { userId,isLoaded } = useAuth();
   const [user,setUser]=useState<User>();
   const router = useRouter();
+  const [width, setWidth] = useState(0);
 
   const testimonialRef=useRef<HTMLButtonElement>(null);
   const form = useForm<z.infer<typeof transformationSchema>>({
@@ -178,6 +179,16 @@ const Page = () => {
     }
   },[userId]);
 
+  useLayoutEffect(()=>{
+    const handleResize = () => {
+      setWidth(window.innerWidth);
+    };
+    window.addEventListener('resize', handleResize);
+    setWidth(window.innerWidth);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  },[]);
 
   const triggerRef=useRef<HTMLButtonElement>(null);
   return (
@@ -203,7 +214,7 @@ const Page = () => {
         </div>}
       {user && (
         <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-6 md:p-12 w-full overflow-x-hidden">
-        <div className={`w-full mx-auto space-y-2 ${assignScreenSizes({ width: window.innerWidth })}`}>
+        <div className={`w-full mx-auto space-y-2 ${assignScreenSizes({ width: width })}`}>
           <div className="text-center space-y-6">
             <div className="relative">
               <h1 className="text-6xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">

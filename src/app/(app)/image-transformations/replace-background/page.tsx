@@ -10,7 +10,7 @@ import {
     RefreshCw,
 } from "lucide-react";
 import { getCldImageUrl } from "next-cloudinary";
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, useLayoutEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -46,6 +46,7 @@ const Page = () => {
     const router = useRouter();
     const testimonialRef=useRef<HTMLButtonElement>(null);
     const [user, setUser] = useState<User>()
+    const [width, setWidth] = useState(0);
     const form = useForm<z.infer<typeof transformationSchema>>({
         resolver: zodResolver(transformationSchema),
         defaultValues: {
@@ -180,7 +181,16 @@ const Page = () => {
         }
       },[userId]);
 
-
+      useLayoutEffect(()=>{
+        const handleResize = () => {
+          setWidth(window.innerWidth);
+        };
+        window.addEventListener('resize', handleResize);
+        setWidth(window.innerWidth);
+        return () => {
+          window.removeEventListener('resize', handleResize);
+        };
+      },[]);
     const triggerRef = useRef<HTMLButtonElement>(null);
 
     return (
@@ -214,7 +224,7 @@ const Page = () => {
             </div>}
             {user && (
                 <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6 w-full overflow-x-hidden">
-                    <div className={`w-full mx-auto space-y-2 ${assignScreenSizes({ width: window.innerWidth })}`}>
+                    <div className={`w-full mx-auto space-y-2 ${assignScreenSizes({ width: width })}`}>
                         {/* Header Section */}
                         <div className="text-center space-y-4">
                             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
